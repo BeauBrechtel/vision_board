@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Admin | Vision Board{% endblock %}
+
+{% block content %}
+<div class="admin-home">
+    <h1>Vision Board Admin</h1>
+    <p class="subtext">Manage employees, announcement slides, backgrounds, and preview the display.</p>
+
+    <div class="admin-grid">
+        <a class="admin-card" href="{{ url_for('employees') }}">
+            <h2>Employees</h2>
+            <p>View, search, add, edit, and delete employees.</p>
+        </a>
+
+        <a class="admin-card" href="{{ url_for('announcements') }}">
+            <h2>Announcements</h2>
+            <p>Create and manage custom announcement slides.</p>
+        </a>
+
+        <a class="admin-card" href="{{ url_for('backgrounds') }}">
+            <h2>Backgrounds</h2>
+            <p>Upload and replace slideshow background images.</p>
+        </a>
+
+        <a class="admin-card" href="{{ url_for('display') }}" target="_blank">
+            <h2>Preview Slideshow</h2>
+            <p>Open the slideshow in a new tab.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

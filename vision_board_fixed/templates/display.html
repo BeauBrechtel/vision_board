@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Board Display</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="display-body">
+    <div id="slideshow">
+
+        <!-- Today / Date Slide -->
+        <section
+            class="slide today-slide active"
+            data-duration="{{ settings['default_slide_duration'] * 1000 }}"
+            {% if month_background %}
+                style="background-image: url('{{ url_for('static', filename='uploads/' + month_background) }}');"
+            {% endif %}
+        >
+            <div class="slide-content center-date-layout" style="color: {{ month_text_color }};">
+                <div class="center-date-text">
+                    <div class="month-word">{{ month_name }}</div>
+                    <div class="day-number">{{ day_number }}</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Birthday Slides -->
+        {% for chunk in birthday_chunks %}
+            <section
+                class="slide birthday-slide"
+                data-duration="{{ settings['default_slide_duration'] * 1000 }}"
+                {% if birthday_background %}
+                    style="background-image: url('{{ url_for('static', filename='uploads/' + birthday_background) }}');"
+                {% endif %}
+            >
+                <div class="birthday-center" style="color: {{ birthday_text_color }};">
+                    {% for person in chunk %}
+                        <div class="birthday-row">
+                            {{ person["name"] }} - {{ month_name }} {{ person["day"] }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endfor %}
+
+        <!-- Fooversary Slides -->
+        {% for chunk in fooversary_chunks %}
+            <section
+                class="slide fooversary-slide"
+                data-duration="{{ settings['default_slide_duration'] * 1000 }}"
+                {% if fooversary_background %}
+                    style="background-image: url('{{ url_for('static', filename='uploads/' + fooversary_background) }}');"
+                {% endif %}
+            >
+                <div class="fooversary-center" style="color: {{ fooversary_text_color }};">
+                    {% for person in chunk %}
+                        <div class="fooversary-row">
+                            {{ person["name"] }} - {{ person["date_string"] }} - {{ person["years"] }} year{% if person["years"] != 1 %}s{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endfor %}
+
+        <!-- New Hire Intro Slide -->
+        {% if new_hires %}
+            <section
+                class="slide new-hire-intro-slide"
+                data-duration="{{ settings['default_slide_duration'] * 1000 }}"
+                {% if new_hire_intro_background %}
+                    style="background-image: url('{{ url_for('static', filename='uploads/' + new_hire_intro_background) }}');"
+                {% endif %}
+            >
+                
+            </section>
+
+            <!-- One Slide Per New Hire -->
+            {% for person in new_hires %}
+<section
+    class="slide new-hire-detail-slide"
+    data-duration="{{ settings['new_hire_slide_duration'] * 1000 }}"
+    {% if new_hire_detail_background %}
+        style="background-image: url('{{ url_for('static', filename='uploads/' + new_hire_detail_background) }}');"
+    {% endif %}
+>
+    <!-- NAME -->
+    <div class="new-hire-name">
+        {{ person["name"] }}
+    </div>
+
+    <!-- FACTS -->
+    <div class="new-hire-facts">
+        {% if person["fun_fact_1"] %}
+            <div>• {{ person["fun_fact_1"] }}</div>
+        {% endif %}
+        {% if person["fun_fact_2"] %}
+            <div>• {{ person["fun_fact_2"] }}</div>
+        {% endif %}
+        {% if person["fun_fact_3"] %}
+            <div>• {{ person["fun_fact_3"] }}</div>
+        {% endif %}
+    </div>
+
+    <!-- PHOTO -->
+    <div class="new-hire-photo-container">
+        {% if person["photo_filename"] %}
+            <img
+                src="{{ url_for('static', filename='uploads/' + person['photo_filename']) }}"
+                class="new-hire-photo"
+                style="transform: translate({{ person['photo_x'] }}px, {{ person['photo_y'] }}px) scale({{ person['photo_scale'] }});"
+            >
+        {% endif %}
+    </div>
+</section>
+{% endfor %}
+        {% endif %}
+
+       <!-- Announcement Slides -->
+{% for announcement in announcements %}
+    {% if announcement["image_filename"] %}
+        <section
+            class="slide announcement-slide"
+            data-duration="{{ announcement['duration_seconds'] * 1000 }}"
+            style="background-image: url('{{ url_for('static', filename='uploads/' + announcement['image_filename']) }}');"
+        >
+        </section>
+    {% endif %}
+{% endfor %}
+
+    </div>
+
+    <script src="{{ url_for('static', filename='slideshow.js') }}"></script>
+
+    <script>
+        function goFullscreen() {
+            const el = document.documentElement;
+
+            if (el.requestFullscreen) {
+                el.requestFullscreen();
+            } else if (el.webkitRequestFullscreen) {
+                el.webkitRequestFullscreen();
+            } else if (el.msRequestFullscreen) {
+                el.msRequestFullscreen();
+            }
+        }
+
+        window.onload = function () {
+            setTimeout(() => {
+                goFullscreen();
+            }, 500);
+        };
+
+        document.addEventListener("click", goFullscreen);
+    </script>
+</body>
+</html>

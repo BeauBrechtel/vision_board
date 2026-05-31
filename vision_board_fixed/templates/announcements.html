@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Announcements | Vision Board{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Announcement Slides</h1>
+        <p class="subtext">Upload completed slide images exactly how they should appear on screen.</p>
+    </div>
+
+    <div class="header-actions">
+        <a class="button-link" href="{{ url_for('admin') }}">Back to Admin</a>
+        <a class="button-link primary" href="{{ url_for('new_announcement') }}">Add Slide</a>
+    </div>
+</div>
+
+<div class="panel">
+    {% if announcements %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Slide Name</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Duration</th>
+                        <th>Preview</th>
+                        <th class="actions-col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for announcement in announcements %}
+                        <tr>
+                            <td>{{ announcement["title"] }}</td>
+                            <td>{{ announcement["start_date"] or "—" }}</td>
+                            <td>{{ announcement["end_date"] or "—" }}</td>
+                            <td>{{ announcement["duration_seconds"] }} sec</td>
+                            <td>
+                                {% if announcement["image_filename"] %}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/' + announcement['image_filename']) }}"
+                                        alt="{{ announcement['title'] }}"
+                                        class="background-thumb"
+                                    >
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td class="actions-cell">
+                                <a class="button-link small" href="{{ url_for('edit_announcement', announcement_id=announcement['id']) }}">Edit</a>
+
+                                <form
+                                    class="inline-form"
+                                    action="{{ url_for('delete_announcement', announcement_id=announcement['id']) }}"
+                                    method="post"
+                                    onsubmit="return confirm('Delete this slide?');"
+                                >
+                                    <button type="submit" class="danger-button">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No announcement slides found.</p>
+    {% endif %}
+</div>
+{% endblock %}

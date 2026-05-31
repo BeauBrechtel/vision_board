@@ -1,0 +1,14 @@
+[Unit]
+Description=Vision Board
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/vision_board
+ExecStart=/home/pi/vision_board/venv/bin/python /home/pi/vision_board/app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

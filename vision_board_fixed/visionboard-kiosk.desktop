@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=Vision Board Kiosk
+Exec=sh -c 'sleep 45; if command -v chromium-browser >/dev/null 2>&1; then CHROME=chromium-browser; else CHROME=chromium; fi; exec $CHROME --noerrdialogs --disable-infobars --disable-session-crashed-bubble --password-store=basic --user-data-dir=/home/pi/.config/visionboard-chrome --kiosk http://localhost:5000/display'

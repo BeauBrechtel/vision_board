@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% if employee %}
+    {% set page_title = "Edit Employee" %}
+{% else %}
+    {% set page_title = "Add Employee" %}
+{% endif %}
+
+{% block title %}{{ page_title }} | Vision Board{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ page_title }}</h1>
+        <p class="subtext">Fill out the employee information below.</p>
+    </div>
+
+    <div class="header-actions">
+        <a class="button-link" href="{{ url_for('employees') }}">Back to Employees</a>
+    </div>
+</div>
+
+<div class="panel form-panel">
+    {% if employee %}
+        <form method="post" action="{{ url_for('update_employee', employee_id=employee['id']) }}" enctype="multipart/form-data">
+    {% else %}
+        <form method="post" action="{{ url_for('create_employee') }}" enctype="multipart/form-data">
+    {% endif %}
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="name">Employee Name</label>
+                <input type="text" id="name" name="name" required value="{{ employee['name'] if employee else '' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="birthday">Birthday</label>
+                <input type="date" id="birthday" name="birthday" value="{{ employee['birthday'] if employee and employee['birthday'] else '' }}">
+                <small>Used for the monthly birthday slide.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="hire_date">Hire Date</label>
+                <input type="date" id="hire_date" name="hire_date" value="{{ employee['hire_date'] if employee and employee['hire_date'] else '' }}">
+                <small>Used for Fooversaries and new hire slides.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="photo">Employee Photo</label>
+                <input type="file" id="photo" name="photo" accept="image/*">
+                {% if employee and employee["photo_filename"] %}
+                    <small>Current file: {{ employee["photo_filename"] }}</small>
+                {% endif %}
+            </div>
+
+            <div class="form-group full-width">
+                <label>Photo Preview</label>
+                <div class="photo-preview-box">
+                    {% if employee and employee["photo_filename"] %}
+                        <img
+                            id="photo-preview-image"
+                            class="photo-preview-image"
+                            src="{{ url_for('static', filename='uploads/' + employee['photo_filename']) }}"
+                            alt="Photo preview"
+                            style="transform: translate({{ employee['photo_x'] if employee['photo_x'] is not none else 0 }}px, {{ employee['photo_y'] if employee['photo_y'] is not none else 0 }}px) scale({{ employee['photo_scale'] if employee['photo_scale'] is not none else 1.0 }});"
+                        >
+                    {% else %}
+                        <img id="photo-preview-image" class="photo-preview-image hidden-preview" alt="Photo preview">
+                        <div id="photo-preview-placeholder" class="photo-preview-placeholder">No photo selected</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            
+
+            <div class="photo-tools-panel full-width" >
+                <div class="form-group">
+                    <label for="photo_scale">Photo Size</label>
+                    <input
+                        type="range"
+                        id="photo_scale"
+                        name="photo_scale"
+                        min="0.5"
+                        max="2.0"
+                        step="0.1"
+                        value="{{ employee['photo_scale'] if employee and employee['photo_scale'] is not none else 1.0 }}"
+                        oninput="updatePhotoPreview()"
+                    >
+                    <small id="photo_scale_value"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo_x">Photo Left / Right Position</label>
+                    <input
+                        type="range"
+                        id="photo_x"
+                        name="photo_x"
+                        min="-200"
+                        max="200"
+                        step="5"
+                        value="{{ employee['photo_x'] if employee and employee['photo_x'] is not none else 0 }}"
+                        oninput="updatePhotoPreview()"
+                    >
+                    <small id="photo_x_value"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="photo_y">Photo Up / Down Position</label>
+                    <input
+                        type="range"
+                        id="photo_y"
+                        name="photo_y"
+                        min="-200"
+                        max="200"
+                        step="5"
+                        value="{{ employee['photo_y'] if employee and employee['photo_y'] is not none else 0 }}"
+                        oninput="updatePhotoPreview()"
+                    >
+                    <small id="photo_y_value"></small>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="fun_fact_1">Fun Fact 1</label>
+                <input type="text" id="fun_fact_1" name="fun_fact_1" value="{{ employee['fun_fact_1'] if employee and employee['fun_fact_1'] else '' }}">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="fun_fact_2">Fun Fact 2</label>
+                <input type="text" id="fun_fact_2" name="fun_fact_2" value="{{ employee['fun_fact_2'] if employee and employee['fun_fact_2'] else '' }}">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="fun_fact_3">Fun Fact 3</label>
+                <input type="text" id="fun_fact_3" name="fun_fact_3" value="{{ employee['fun_fact_3'] if employee and employee['fun_fact_3'] else '' }}">
+            </div>
+
+            
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="primary-button">
+                {% if employee %}Save Changes{% else %}Create Employee{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+
+
+function updatePhotoPreview() {
+    const previewImage = document.getElementById("photo-preview-image");
+    const scaleInput = document.getElementById("photo_scale");
+    const xInput = document.getElementById("photo_x");
+    const yInput = document.getElementById("photo_y");
+
+    if (!previewImage || !scaleInput || !xInput || !yInput) return;
+
+    const scale = scaleInput.value;
+    const x = xInput.value;
+    const y = yInput.value;
+
+    previewImage.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+
+    document.getElementById("photo_scale_value").textContent = `Current: ${scale}`;
+    document.getElementById("photo_x_value").textContent = `Current: ${x}px`;
+    document.getElementById("photo_y_value").textContent = `Current: ${y}px`;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const photoInput = document.getElementById("photo");
+    const previewImage = document.getElementById("photo-preview-image");
+    const placeholder = document.getElementById("photo-preview-placeholder");
+    
+
+    if (photoInput) {
+        photoInput.addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+                previewImage.classList.remove("hidden-preview");
+                if (placeholder) {
+                    placeholder.style.display = "none";
+                }
+                updatePhotoPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    updatePhotoPreview();
+});
+</script>
+{% endblock %}

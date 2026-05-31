@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% if announcement %}
+    {% set page_title = "Edit Announcement Slide" %}
+{% else %}
+    {% set page_title = "Add Announcement Slide" %}
+{% endif %}
+
+{% block title %}{{ page_title }} | Vision Board{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ page_title }}</h1>
+        <p class="subtext">Upload a finished announcement slide image exactly how it should appear on screen.</p>
+    </div>
+
+    <div class="header-actions">
+        <a class="button-link" href="{{ url_for('announcements') }}">Back to Announcements</a>
+    </div>
+</div>
+
+<div class="panel form-panel">
+    {% if announcement %}
+        <form method="post" action="{{ url_for('update_announcement', announcement_id=announcement['id']) }}" enctype="multipart/form-data">
+    {% else %}
+        <form method="post" action="{{ url_for('create_announcement') }}" enctype="multipart/form-data">
+    {% endif %}
+
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="title">Slide Name</label>
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    required
+                    value="{{ announcement['title'] if announcement else '' }}"
+                >
+                <small>This is only for the admin list so you can identify the slide.</small>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="image">Slide Image</label>
+                <input type="file" id="image" name="image" accept="image/*" {% if not announcement %}required{% endif %}>
+                {% if announcement and announcement["image_filename"] %}
+                    <small>Current file: {{ announcement["image_filename"] }}</small>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Start Date</label>
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="{{ announcement['start_date'] if announcement and announcement['start_date'] else '' }}"
+                >
+                <small>Leave blank to allow immediately.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">End Date</label>
+                <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    value="{{ announcement['end_date'] if announcement and announcement['end_date'] else '' }}"
+                >
+                <small>Leave blank for no end date.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="duration_seconds">Slide Duration (seconds)</label>
+                <input
+                    type="number"
+                    id="duration_seconds"
+                    name="duration_seconds"
+                    min="1"
+                    value="{{ announcement['duration_seconds'] if announcement else 15 }}"
+                >
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="primary-button">
+                {% if announcement %}Save Changes{% else %}Create Slide{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
